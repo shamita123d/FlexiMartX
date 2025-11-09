@@ -1,0 +1,21 @@
+1762680524082	Move folder
+1762680937475	Copy package
+1762680956188	Delete element
+1762681042434	Delete element
+1762681056561	Delete element
+1762682596005	Copy package
+1762682625203	Delete element
+1762682883184	Copy package
+1762682901924	Delete element
+1762683017993	Delete element
+1762683101582	Rename package 'user.entity'
+1762683129193	Rename package 'user.repository'
+1762683324089	Rename package 'user.service'
+1762683374272	Rename package 'order.entity'
+1762683456055	Rename package 'order.repository'
+1762683530525	Rename package 'order.service'
+1762683586143	Rename package 'product.entity'
+1762683680238	Rename package 'product.repository'
+1762683722958	Rename package 'product.service'
+1762683768564	Rename package 'payment.entity'
+1762683842821	Rename package 'payment.service'

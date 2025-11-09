@@ -1,0 +1,5 @@
+package com.fleximartx.backend.user.repository;
+
+public class UserRepository {
+
+}

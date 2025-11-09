@@ -1,0 +1,5 @@
+package com.fleximartx.backend.order.service;
+
+public class OrderService {
+
+}

@@ -1,0 +1,5 @@
+package com.fleximartx.backend.order.entity;
+
+public class Cart {
+
+}

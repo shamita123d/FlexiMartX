@@ -1,0 +1,5 @@
+package com.fleximartx.backend.product.repository;
+
+public class ProductRepository {
+
+}

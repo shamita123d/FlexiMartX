@@ -1,0 +1,5 @@
+package com.fleximartx.backend.config;
+
+public class KafkaConfig {
+
+}
