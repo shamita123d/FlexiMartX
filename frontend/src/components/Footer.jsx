@@ -1,13 +1,9 @@
 import React from "react";
 
-function Footer() {
+export default function Footer() {
   return (
-    <footer className="bg-gray-800 text-white p-4 mt-8">
-      <div className="container mx-auto text-center">
-        © 2025 FlexiMartX. All rights reserved.
-      </div>
+    <footer className="bg-gray-800 text-white text-center p-4 mt-6">
+      &copy; {new Date().getFullYear()} FlexiMartX. All rights reserved.
     </footer>
   );
 }
-
-export default Footer;

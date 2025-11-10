@@ -1,0 +1,92 @@
+package com.fleximartx.order_service.service;
+
+import com.fleximartx.order_service.model.Order;
+import com.fleximartx.order_service.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+
+import java.util.*;
+
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${cart.service.url}")
+    private String cartServiceUrl;
+
+    @Value("${product.service.url}")
+    private String productServiceUrl;
+
+    // ✅ Constructor with RestTemplate that supports PATCH
+    public OrderService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+        this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+    }
+
+    public Order saveOrder(Order order) {
+        return orderRepository.save(order);
+    }
+
+    public Order placeOrder(Long userId) {
+        // 1️⃣ Get cart items from Cart Service
+        CartItemDTO[] cartItems = restTemplate.getForObject(
+                cartServiceUrl + userId,
+                CartItemDTO[].class
+        );
+
+        if (cartItems == null || cartItems.length == 0) {
+            throw new RuntimeException("Cart is empty!");
+        }
+
+        // 2️⃣ Calculate total price
+        double total = Arrays.stream(cartItems)
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+
+        // 3️⃣ Create order
+        Order order = new Order();
+        order.setUserId(userId);
+        order.setTotalAmount(total);
+        order.setStatus("CREATED");
+        orderRepository.save(order);
+
+        // 4️⃣ Update product stock (reduce quantity) using PATCH
+        for (CartItemDTO item : cartItems) {
+            String url = productServiceUrl + "/" + item.getProductId() + "/reduce-stock?qty=" + item.getQuantity();
+            restTemplate.exchange(url, HttpMethod.PATCH, HttpEntity.EMPTY, Void.class);
+        }
+
+        // 5️⃣ Clear user cart
+        restTemplate.delete(cartServiceUrl + "/clear/" + userId);
+
+        return order;
+    }
+
+    public Order getOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found!"));
+    }
+
+    // DTO class for cart items
+    static class CartItemDTO {
+        private String productId;
+        private String productName;
+        private Double price;
+        private Integer quantity;
+
+        public String getProductId() { return productId; }
+        public void setProductId(String productId) { this.productId = productId; }
+        public String getProductName() { return productName; }
+        public void setProductName(String productName) { this.productName = productName; }
+        public Double getPrice() { return price; }
+        public void setPrice(Double price) { this.price = price; }
+        public Integer getQuantity() { return quantity; }
+        public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    }
+}

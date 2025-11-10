@@ -1,0 +1,5 @@
+package com.fleximartx.cart_service.repository;
+
+public class CartRepository {
+
+}

@@ -1,0 +1,5 @@
+package com.fleximartx.payment_service.service;
+
+public class PaymentService {
+
+}

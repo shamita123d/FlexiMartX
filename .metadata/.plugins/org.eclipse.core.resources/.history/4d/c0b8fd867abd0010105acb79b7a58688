@@ -1,0 +1,5 @@
+package com.fleximartx.product_service.model;
+
+public class Product {
+
+}

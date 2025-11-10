@@ -1,0 +1,12 @@
+package com.fleximartx.cart_service.repository;
+
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.fleximartx.cart_service.model.CartItem;
+
+import java.util.List;
+
+public interface CartRepository extends JpaRepository<CartItem, Long> {
+    List<CartItem> findByUserId(Long userId);
+}

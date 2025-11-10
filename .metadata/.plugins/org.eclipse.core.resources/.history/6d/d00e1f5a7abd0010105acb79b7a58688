@@ -1,0 +1,15 @@
+package com.fleximartx.cart_service.model;
+
+import jakarta.persistence.Entity;
+
+@Entity
+public class CartItem {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long userId;
+    private Long productId;
+    private int quantity;
+    private double price;  // price at the time of adding
+    // getters & setters
+}

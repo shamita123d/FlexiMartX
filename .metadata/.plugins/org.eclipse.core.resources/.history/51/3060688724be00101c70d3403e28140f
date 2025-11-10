@@ -1,0 +1,71 @@
+package com.fleximartx.cart_service.controller;
+
+import com.fleximartx.cart_service.model.CartItem;
+import com.fleximartx.cart_service.repository.CartRepository;
+import com.fleximartx.cart_service.service.CartService;
+
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+@RestController
+@RequestMapping("/cart")
+@CrossOrigin(origins = "*")
+public class CartController {
+	private final CartRepository cartRepository;
+    private final CartService cartService;
+    private final RedisTemplate<String, Object> redisTemplate;
+    
+    public CartController(CartRepository cartRepository,CartService cartService, RedisTemplate<String, Object> redisTemplate) {
+        this.cartService = cartService;
+        this.redisTemplate = redisTemplate;
+        this.cartRepository=cartRepository;
+    }
+    @GetMapping("/test")
+    public String testConnections() {
+        return "✅ Cart-Service is running fine with Redis + MySQL!";
+    }
+
+    @PostMapping("/add")
+    public CartItem addToCart(@RequestParam Long userId,
+                              @RequestParam Long productId,
+                              @RequestParam Integer quantity) {
+        return cartService.addToCart(userId, productId, quantity);
+    }
+
+    @GetMapping("/{userId}")
+    public List<CartItem> getUserCart(@PathVariable Long userId) {
+        return cartService.getUserCart(userId);
+    }
+
+    @DeleteMapping("/item/{id}")
+    public String removeItem(@PathVariable Long id) {
+        cartService.removeItem(id);
+        return "Item removed from cart!";
+    }
+    @DeleteMapping("/clear/{userId}")
+    public String clearCart(@PathVariable Long userId) {
+        cartRepository.deleteAll(cartRepository.findByUserId(userId));
+        return "Cart cleared!";
+    }
+
+    
+    @GetMapping("/test-redis")
+    public String testRedis() {
+        String key = "test:key";
+        String value = "Redis is connected successfully! 🚀";
+
+        // save to redis with 30 sec expiry
+        redisTemplate.opsForValue().set(key, value, 30, TimeUnit.SECONDS);
+
+        // read from redis
+        Object cachedValue = redisTemplate.opsForValue().get(key);
+
+        if (cachedValue != null) {
+            return "✅ " + cachedValue.toString();
+        } else {
+            return "❌ Redis test failed — no data found!";
+        }
+    }
+}

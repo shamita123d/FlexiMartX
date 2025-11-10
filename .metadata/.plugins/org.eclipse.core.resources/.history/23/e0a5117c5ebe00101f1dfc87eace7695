@@ -1,0 +1,45 @@
+package com.fleximartx.payment_service.controller;
+
+import com.fleximartx.payment_service.model.Payment;
+import com.fleximartx.payment_service.service.PaymentService;
+import lombok.Data;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/payments")
+@CrossOrigin(origins = "*")
+public class PaymentController {
+
+    private final PaymentService paymentService;
+
+    // ✅ Constructor injection
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    // ✅ Handle POST /payments/process with JSON body
+    @PostMapping("/process")
+    public Payment processPayment(@RequestBody PaymentRequest paymentRequest) {
+        return paymentService.processPayment(
+                paymentRequest.getOrderId(),
+                paymentRequest.getUserId(),
+                paymentRequest.getAmount(),
+                paymentRequest.getMethod()
+        );
+    }
+
+    // ✅ Use static nested class to avoid "non-static inner class" error
+    @Data
+    public static class PaymentRequest {
+        private Long orderId;
+        private Long userId;
+        private Double amount;
+        private String method;
+    }
+
+    // ✅ Handle GET /payments/{id}
+    @GetMapping("/{id}")
+    public Payment getPayment(@PathVariable Long id) {
+        return paymentService.getPayment(id);
+    }
+}

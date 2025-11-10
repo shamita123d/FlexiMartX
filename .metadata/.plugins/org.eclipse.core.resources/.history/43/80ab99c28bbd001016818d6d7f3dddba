@@ -1,0 +1,5 @@
+package com.fleximartx.order_service.repository;
+
+public class OrderRepository {
+
+}

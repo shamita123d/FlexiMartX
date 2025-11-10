@@ -1,0 +1,41 @@
+package com.fleximartx.order_service.controller;
+
+import com.fleximartx.order_service.model.Order;
+import com.fleximartx.order_service.service.OrderService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/orders")
+@CrossOrigin(origins = "*")
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    // ✅ Place a new order
+    @PostMapping("/place")
+    public Order placeOrder(@RequestParam Long userId) {
+        return orderService.placeOrder(userId);
+    }
+    @GetMapping("/test")
+    public String testConnections() {
+        return "✅ Order-Service is running fine with MySQL!";
+    }
+    // ✅ Get order by ID
+    @GetMapping("/{orderId}")
+    public Order getOrder(@PathVariable Long orderId) {
+        return orderService.getOrder(orderId);
+    }
+
+    // ✅ Update order status (e.g. PAID, SHIPPED, DELIVERED)
+    @PatchMapping("/{orderId}/status")
+    public String updateOrderStatus(@PathVariable Long orderId, @RequestParam String status) {
+        Order order = orderService.getOrder(orderId);
+        order.setStatus(status);
+        orderService.saveOrder(order);
+        return "Order status updated to " + status;
+    }
+}

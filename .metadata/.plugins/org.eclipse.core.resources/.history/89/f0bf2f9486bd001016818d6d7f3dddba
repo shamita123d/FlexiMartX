@@ -1,0 +1,59 @@
+package com.fleximartx.cart_service.service;
+
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import com.fleximartx.cart_service.model.CartItem;
+import com.fleximartx.cart_service.repository.CartRepository;
+
+import java.util.List;
+
+@Service
+public class CartService {
+
+    private final CartRepository cartRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${product.service.url}")
+    private String productServiceUrl;
+
+    public CartService(CartRepository cartRepository) {
+        this.cartRepository = cartRepository;
+        this.restTemplate = new RestTemplate();
+    }
+
+    public CartItem addToCart(Long userId, Long productId, Integer quantity) {
+        // Fetch product details from Product Service
+        ProductDTO product = restTemplate.getForObject(productServiceUrl + productId, ProductDTO.class);
+
+        CartItem item = new CartItem();
+        item.setUserId(userId);
+        item.setProductId(productId);
+        item.setProductName(product.getName());
+        item.setPrice(product.getPrice());
+        item.setQuantity(quantity);
+
+        return cartRepository.save(item);
+    }
+
+    public List<CartItem> getUserCart(Long userId) {
+        return cartRepository.findByUserId(userId);
+    }
+
+    public void removeItem(Long cartItemId) {
+        cartRepository.deleteById(cartItemId);
+    }
+
+    // DTO for product data
+    static class ProductDTO {
+        private String name;
+        private Double price;
+        // getters and setters
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public Double getPrice() { return price; }
+        public void setPrice(Double price) { this.price = price; }
+    }
+}

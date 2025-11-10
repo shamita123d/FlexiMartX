@@ -1,0 +1,36 @@
+package com.fleximartx.cart_service.controller;
+
+import com.fleximartx.cart_service.model.CartItem;
+import com.fleximartx.cart_service.service.CartService;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
+@RestController
+@RequestMapping("/cart")
+@CrossOrigin(origins = "*")
+public class CartController {
+
+    private final CartService cartService;
+
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
+    }
+
+    @PostMapping("/add")
+    public CartItem addToCart(@RequestParam Long userId,
+                              @RequestParam Long productId,
+                              @RequestParam Integer quantity) {
+        return cartService.addToCart(userId, productId, quantity);
+    }
+
+    @GetMapping("/{userId}")
+    public List<CartItem> getUserCart(@PathVariable Long userId) {
+        return cartService.getUserCart(userId);
+    }
+
+    @DeleteMapping("/{id}")
+    public String removeItem(@PathVariable Long id) {
+        cartService.removeItem(id);
+        return "Item removed from cart!";
+    }
+}

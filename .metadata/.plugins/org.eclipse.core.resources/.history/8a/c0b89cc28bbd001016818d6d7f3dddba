@@ -1,0 +1,27 @@
+package com.fleximartx.order_service.controller;
+
+import com.fleximartx.order_service.model.Order;
+import com.fleximartx.order_service.service.OrderService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/orders")
+@CrossOrigin(origins = "*")
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping("/place")
+    public Order placeOrder(@RequestParam Long userId) {
+        return orderService.placeOrder(userId);
+    }
+
+    @GetMapping("/{orderId}")
+    public Order getOrder(@PathVariable Long orderId) {
+        return orderService.getOrder(orderId);
+    }
+}

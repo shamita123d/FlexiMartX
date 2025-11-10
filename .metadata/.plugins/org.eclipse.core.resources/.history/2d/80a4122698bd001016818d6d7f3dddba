@@ -1,0 +1,69 @@
+package com.fleximartx.cart_service.service;
+
+import com.fleximartx.cart_service.model.CartItem;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class CartService {
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final RestTemplate restTemplate;
+
+    @Value("${product.service.url}")
+    private String productServiceUrl;
+
+    public CartService(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+        this.restTemplate = new RestTemplate();
+    }
+
+    private String getCartKey(Long userId) {
+        return "cart:" + userId;
+    }
+
+    public CartItem addToCart(Long userId, Long productId, Integer quantity) {
+        // ✅ Get product details from Product Service
+        ProductDTO product = restTemplate.getForObject(productServiceUrl + productId, ProductDTO.class);
+
+        CartItem item = new CartItem(
+                productId,
+                product.getName(),
+                product.getPrice(),
+                quantity
+        );
+
+        redisTemplate.opsForHash().put(getCartKey(userId), productId.toString(), item);
+        return item;
+    }
+
+    public List<CartItem> getUserCart(Long userId) {
+        return redisTemplate.opsForHash().values(getCartKey(userId))
+                .stream()
+                .map(obj -> (CartItem) obj)
+                .toList();
+    }
+
+    public void removeItem(Long userId, Long productId) {
+        redisTemplate.opsForHash().delete(getCartKey(userId), productId.toString());
+    }
+
+    public void clearCart(Long userId) {
+        redisTemplate.delete(getCartKey(userId));
+    }
+
+    static class ProductDTO {
+        private String name;
+        private Double price;
+
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public Double getPrice() { return price; }
+        public void setPrice(Double price) { this.price = price; }
+    }
+}

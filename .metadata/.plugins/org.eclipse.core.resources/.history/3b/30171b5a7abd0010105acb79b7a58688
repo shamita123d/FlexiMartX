@@ -1,0 +1,5 @@
+package com.fleximartx.cart_service.model;
+
+public class Cart_Item {
+
+}
